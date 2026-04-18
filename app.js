@@ -266,6 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (dir === 1) {
                 const movie = movies[card.dataset.index];
                 addToLiked(movie.title);
+                if (window.NoirAnalytics) NoirAnalytics.track('like', { movie: movie.title });
+            } else {
+                const movie = movies[card.dataset.index];
+                if (window.NoirAnalytics) NoirAnalytics.track('nope', { movie: movie.title });
             }
             initCards();
         }, 350);
@@ -311,6 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
         msgText += `\u200Fلو سمحت محتاج أعرف تفاصيل الشراء لأعلى جودة متوفرة، الحساب كدا يبقى كام وإيه نظام التسليم؟ تسلم مقدماً.`;
         
         const msg = encodeURIComponent(msgText);
+        
+        // Tracking Conversion
+        if (window.NoirAnalytics) {
+            NoirAnalytics.track('purchase', { 
+                action: actionType, 
+                movies: likedMovies,
+                count: likedMovies.length 
+            });
+        }
+
         window.open(`https://wa.me/${WHATSAPP_NUM}?text=${msg}`, '_blank');
     }
 

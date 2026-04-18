@@ -236,7 +236,7 @@
                 <span class="material-symbols-outlined text-3xl" data-icon="shopping_bag">shopping_bag</span>
                 <span id="cart-count" class="cart-badge">0</span>
             </a>
-            <button id="btn-buy" class="bg-primary text-on-primary font-bold py-3 px-8 rounded-full hover:bg-primary-container transition-all animate-pulse-glow font-sans tracking-widest uppercase text-sm shadow-xl">
+            <button id="btn-buy" data-track="true" class="bg-primary text-on-primary font-bold py-3 px-8 rounded-full hover:bg-primary-container transition-all animate-pulse-glow font-sans tracking-widest uppercase text-sm shadow-xl">
                 شراء الأفلام
             </button>
         </div>
@@ -299,15 +299,15 @@
                 
                 <div class="flex gap-4 pt-4 lg:pt-8 w-full justify-start items-center">
                     <!-- Swipe controls -->
-                    <button id="btn-nope" class="bg-transparent border border-rose-500/30 text-rose-500 hover:bg-rose-500/10 font-bold w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
+                    <button id="btn-nope" data-track="true" class="bg-transparent border border-rose-500/30 text-rose-500 hover:bg-rose-500/10 font-bold w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
                         <span class="material-symbols-outlined text-3xl">close</span>
                     </button>
-                    <button id="btn-book" class="bg-primary text-on-primary font-body font-bold py-5 px-10 md:px-14 rounded-full hover:bg-primary-container transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_50px_rgba(242,202,80,0.3)] flex items-center justify-center gap-3 animate-pulse-glow">
+                    <button id="btn-book" data-track="true" class="bg-primary text-on-primary font-body font-bold py-5 px-10 md:px-14 rounded-full hover:bg-primary-container transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_50px_rgba(242,202,80,0.3)] flex items-center justify-center gap-3 animate-pulse-glow">
                         <span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
                         <span class="hidden sm:inline">اطلب الآن</span>
                         <span class="sm:hidden">اطلب</span>
                     </button>
-                    <button id="btn-like" class="bg-transparent border border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 font-bold w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
+                    <button id="btn-like" data-track="true" class="bg-transparent border border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 font-bold w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
                         <span class="material-symbols-outlined text-3xl">favorite</span>
                     </button>
                 </div>
@@ -326,12 +326,12 @@
             <span class="material-symbols-outlined text-4xl">payments</span>
             <span class="font-sans text-[10px] uppercase tracking-widest mt-1 font-bold">شباك التذاكر</span>
         </a>
-        <button id="btn-reload" class="flex flex-col items-center justify-center text-neutral-500 p-2 hover:bg-neutral-800">
-            <span class="material-symbols-outlined">refresh</span>
-            <span class="font-sans text-[10px] uppercase tracking-widest mt-1">تحديث</span>
-        </button>
-    </nav>
-
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    
+    <script src="firebase-init.js"></script>
+    <script src="analytics.js"></script>
     <script src="movies.js"></script>
     <script src="app.js"></script>
 </body>

@@ -1,0 +1,32 @@
+name: Weekly Analytics Report
+
+on:
+  schedule:
+    # Runs every Friday at 10:00 UTC (12:00 PM Egypt Time)
+    - cron: '0 10 * * 5'
+  workflow_dispatch: # Allows manual trigger for testing
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/status-nodejs@v4
+      with:
+        node-version: '20'
+
+    - name: Install Dependencies
+      run: |
+        npm install firebase-admin nodemailer
+
+    - name: Run Reporting Script
+      env:
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        REPORT_RECIPIENT_EMAIL: ${{ secrets.REPORT_RECIPIENT_EMAIL }}
+      run: node scripts/send_report.js

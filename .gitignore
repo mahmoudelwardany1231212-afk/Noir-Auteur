@@ -1,10 +1,18 @@
+# Security & Secrets
+.env
+*.json
+!movies.json # Keep movie data
+!package.json # Keep package config
+
+# Dependencies
+node_modules/
+
 # Python Scripts
 *.py
 __pycache__/
 
 # Metadata & Logs
 movies_list.txt
-movies.json
 audit_*.json
 *.log
 
