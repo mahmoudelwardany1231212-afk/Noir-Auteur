@@ -64,19 +64,25 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!movies || movies.length === 0) return;
 
+        // PERFORMANCE OPTIMIZATION: Only render the top 10 cards initially 
+        // to speed up DOM creation and image requests.
+        const visibleBatch = movies.slice(0, 10);
+        const preloaderBar = document.getElementById('preloader-bar');
+        
         // Render backwards for z-index stacking
-        for (let i = movies.length - 1; i >= 0; i--) {
-            const movie = movies[i];
+        for (let i = visibleBatch.length - 1; i >= 0; i--) {
+            const movie = visibleBatch[i];
             const card = document.createElement('div');
             card.className = 'movie-card';
             card.dataset.index = i;
             
-            // Graceful path handling (especially if json is stale)
+            // Update preloader bar
+            if (preloaderBar) preloaderBar.style.width = `${((visibleBatch.length - i) / visibleBatch.length) * 100}%`;
+
             let posterPath = movie.poster;
             if(!posterPath || posterPath.includes('placeholder.jpg')) {
                 posterPath = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
             } else {
-                // Ensure correct relative path depending on where script is running
                 posterPath = posterPath.replace(/\\/g, '/');
             }
             
@@ -155,9 +161,19 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSwipe(remaining[0]);
         
         // Add wiggle hint if it's the first card and no interaction yet
-        if (remaining.length === movies.length) {
+        if (remaining.length === movies.length || (remaining.length === 10 && !sessionStorage.getItem('interacted'))) {
             remaining[0].classList.add('hint-wiggle');
         }
+
+        // FADE OUT PRELOADER
+        setTimeout(() => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.style.opacity = '0';
+                preloader.style.pointerEvents = 'none';
+                setTimeout(() => preloader.remove(), 1000);
+            }
+        }, 800);
     }
     
     function hideTutorial() {
@@ -188,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
             card.classList.add('moving');
+            sessionStorage.setItem('interacted', 'true');
             hideTutorial(); // Remove hints as soon as user touches
         };
 
