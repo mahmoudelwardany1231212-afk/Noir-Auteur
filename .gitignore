@@ -1,0 +1,21 @@
+# Python Scripts
+*.py
+__pycache__/
+
+# Metadata & Logs
+movies_list.txt
+movies.json
+audit_*.json
+*.log
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Empty Directories
+posters/

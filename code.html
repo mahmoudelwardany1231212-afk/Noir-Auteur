@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Noir Auteur - Screening</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#313030",
+                        "tertiary": "#bfcdff",
+                        "on-secondary": "#353026",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#ffe088",
+                        "on-tertiary-container": "#254188",
+                        "on-primary-fixed-variant": "#574500",
+                        "on-background": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "on-surface-variant": "#d0c5af",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#b4c5ff",
+                        "secondary-fixed": "#ebe1d3",
+                        "tertiary-fixed": "#dbe1ff",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#e9c349",
+                        "inverse-primary": "#735c00",
+                        "secondary-container": "#4e483e",
+                        "error": "#ffb4ab",
+                        "on-error": "#690005",
+                        "primary-container": "#d4af37",
+                        "on-tertiary": "#082b72",
+                        "on-primary-container": "#554300",
+                        "background": "#131313",
+                        "surface": "#131313",
+                        "outline-variant": "#4d4635",
+                        "outline": "#99907c",
+                        "tertiary-container": "#97b0ff",
+                        "surface-bright": "#3a3939",
+                        "secondary-fixed-dim": "#cfc5b8",
+                        "on-tertiary-fixed": "#00174b",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-dim": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "secondary": "#cfc5b8",
+                        "on-surface": "#e5e2e1",
+                        "surface-variant": "#353534",
+                        "primary": "#f2ca50",
+                        "on-primary-fixed": "#241a00",
+                        "on-secondary-fixed": "#201b12",
+                        "on-secondary-fixed-variant": "#4c463c",
+                        "on-secondary-container": "#c0b7aa",
+                        "on-primary": "#3c2f00",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#e9c349",
+                        "on-tertiary-fixed-variant": "#27438a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    "backgroundImage": {
+                        'film-grain': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-family: theme('fontFamily.body');
+        }
+        h1, h2, h3, h4, h5, h6, .font-headline {
+            font-family: theme('fontFamily.headline');
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden bg-background">
+<!-- Film Grain Overlay -->
+<div class="fixed inset-0 pointer-events-none bg-film-grain mix-blend-overlay z-50"></div>
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full bg-neutral-900/80 backdrop-blur-xl tonal shift via surface-container-low flat no shadows flex justify-between items-center px-8 py-6 z-50 hidden md:flex">
+<div class="text-2xl font-serif italic text-yellow-500 font-headline tracking-tighter uppercase font-extrabold text-primary">
+            NOIR AUTEUR
+        </div>
+<nav class="flex items-center gap-8 font-sans uppercase tracking-widest text-xs text-neutral-400">
+<a class="text-yellow-500 font-bold border-b border-yellow-500 pb-1 hover:text-yellow-400 transition-colors duration-300" href="#">Discover</a>
+<a class="hover:text-yellow-400 transition-colors duration-300" href="#">Archive</a>
+</nav>
+<div class="flex items-center gap-6 text-yellow-500">
+<a class="hover:text-yellow-400 transition-colors duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</a>
+<button class="bg-primary text-on-primary font-bold py-2 px-6 rounded-md hover:bg-primary-container transition-colors duration-300 font-sans tracking-widest uppercase text-xs scale-95 duration-200 ease-in-out">
+                Purchase
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="relative min-h-screen pt-0 md:pt-24 pb-24 flex items-center justify-center">
+<!-- Cinematic Spotlight Gradient -->
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/15 via-background to-background opacity-60 z-0 pointer-events-none"></div>
+<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+<!-- Poster Stack (Visual Focus) -->
+<div class="relative h-[614px] lg:h-[819px] flex justify-center items-center perspective-1000">
+<!-- Background Poster (Out of focus) -->
+<div class="absolute w-[80%] h-[90%] transform -rotate-6 scale-95 opacity-40 blur-sm rounded-lg overflow-hidden shadow-2xl surface-container-highest transition-transform duration-700 ease-out z-0">
+<img alt="Vintage clapperboard and film reels in black and white" class="w-full h-full object-cover" data-alt="Vintage clapperboard and film reels on dark background in black and white noir style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAceUL2MKwls5E0_WGrt0oVS_QyECvfEBe_f823BQ5BzvAe3pxgOZSGbEdUK0tdWmhAP9plcX7wf6oWuDHE0_mDB8t_V2x9YAghgUkk226aSI_eBwPufBDqXeap6LcJ2S3oOCEkCBUOVKy3dh0aLbcoHO76KgbLYTfJEQAQjuGDg9c2FPnil2O5fJGDQwip9TBFzhK7i0IsiGAcc9-rlao-_kLfn3kx5xesIp9XRnpdApmJUPg6K3XERQvjRlk2SPvSgAca1xKzSw"/>
+<div class="absolute inset-0 bg-black/60"></div>
+</div>
+<!-- Foreground Poster (In focus) -->
+<div class="absolute w-[85%] h-[95%] transform rotate-2 shadow-2xl rounded-lg overflow-hidden surface-container z-10 hover:scale-105 hover:rotate-0 transition-all duration-700 ease-out border border-outline-variant/20">
+<img alt="Abstract dark smoke on black background" class="w-full h-full object-cover" data-alt="Abstract dark smoke patterns illuminated by warm golden spotlight on pitch black background cinematic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6Nry5j-iJ2p6M-k_kJ91rT483ZOyztPysFaZbgtJVPPK_70ngMcg5_ZWHJm7YZB-ymRvaFyn7OUl6RH4wwI9AY8cEM2z6CVc2AHEdclHp1W9qBdEkLzFylUG-I19QmA0pvUvr9dVZR6hYRpjM4XvHHoYgk4PdhOC6FoMVW2a2Yd5ZVbpDQZFgYvw7ZWgvi-Ifv6Y8PzjxHabarAPRhxrb5S2LQAaLWWbYz0wz06ppT9Eeiw4dNqULOti8Zf6nK7y9QByyXqcYmXI"/>
+<!-- Gradient overlay for text readability if poster was full width -->
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+</div>
+</div>
+<!-- Marketing / Typography Focus -->
+<div class="flex flex-col items-start justify-center space-y-8 z-20">
+<div class="space-y-2">
+<p class="font-sans text-primary tracking-[0.2em] text-xs uppercase font-bold">Now Showing</p>
+<h1 class="font-headline text-5xl md:text-7xl lg:text-[5.5rem] leading-[0.9] text-on-surface font-extrabold tracking-tighter mix-blend-lighten">
+                        SHADOWS <br/>
+<span class="text-primary italic font-light">&amp;</span> DUST
+                    </h1>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-sans text-sm tracking-widest uppercase">
+<span>2024</span>
+<span class="w-1 h-1 bg-primary rounded-full"></span>
+<span>134 MIN</span>
+<span class="w-1 h-1 bg-primary rounded-full"></span>
+<span>NEO-NOIR</span>
+</div>
+<p class="font-sans text-on-surface-variant leading-relaxed max-w-md text-sm md:text-base border-l border-primary/30 pl-4">
+                    A detective with a fractured past navigates a city where the neon lights hide deeper, older darkness. The truth is never black and white.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 pt-8 w-full sm:w-auto">
+<button class="bg-primary text-on-primary font-body font-bold py-4 px-10 rounded-md hover:bg-primary-container transition-all duration-300 uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(242,202,80,0.15)] hover:shadow-[0_0_60px_rgba(242,202,80,0.25)] flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+                        Purchase Tickets
+                    </button>
+<button class="bg-transparent border border-outline-variant/50 text-primary font-body font-bold py-4 px-8 rounded-md hover:bg-surface-container-highest transition-all duration-300 uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+                        Trailer
+                    </button>
+</div>
+<!-- Subtle Navigation / Socials for Mobile or secondary focus -->
+<div class="pt-12 flex gap-6 text-on-surface-variant/60">
+<a class="hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined" data-icon="share">share</span></a>
+<a class="hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full rounded-t-3xl tonal depth using surface-container-high shadow-2xl z-50 flex justify-around p-4 md:hidden bg-neutral-900/90 backdrop-blur-lg">
+<a class="flex flex-col items-center justify-center bg-yellow-500/10 text-yellow-500 rounded-xl p-2 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="movie" data-weight="fill" style="font-variation-settings: 'FILL' 1;">movie</span>
+<span class="font-sans text-[10px] uppercase tracking-widest mt-1">Screening</span>
+</a>
+<a class="flex flex-col items-center justify-center text-neutral-500 p-2 hover:bg-neutral-800 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-sans text-[10px] uppercase tracking-widest mt-1">Box Office</span>
+</a>
+<a class="flex flex-col items-center justify-center text-neutral-500 p-2 hover:bg-neutral-800 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span class="font-sans text-[10px] uppercase tracking-widest mt-1">Contact</span>
+</a>
+</nav>
+</body></html>
