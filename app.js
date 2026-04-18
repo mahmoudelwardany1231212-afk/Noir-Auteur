@@ -19,6 +19,61 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionStorage.removeItem('likedMovies');
     let likedMovies = [];
     
+    // --- Activity & Background Logic ---
+    let userActiveTimer;
+    let bgCycleInterval;
+
+    let hasInteracted = false;
+
+    function setActivity(active) {
+        const stack = document.getElementById('cards-stack');
+        const topCard = document.querySelector('.movie-card:not(.removed)');
+        
+        if (active) {
+            stack?.classList.add('user-active');
+            // Stopped on first interaction (resets on refresh)
+            if (topCard && !hasInteracted) {
+                topCard.classList.add('animate-swipe');
+            }
+            bgBlurImg?.classList.add('green-cinematic-filter');
+            startBgCycle();
+            
+            clearTimeout(userActiveTimer);
+            userActiveTimer = setTimeout(() => setActivity(false), 5000); 
+        } else {
+            stack?.classList.remove('user-active');
+            if (topCard) topCard.classList.remove('animate-swipe');
+            bgBlurImg?.classList.remove('green-cinematic-filter');
+            stopBgCycle();
+        }
+    }
+
+    function startBgCycle() {
+        if (bgCycleInterval) return;
+        bgCycleInterval = setInterval(() => {
+            if (movies.length > 0 && bgBlurImg) {
+                const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+                bgBlurImg.style.opacity = '0';
+                setTimeout(() => {
+                    bgBlurImg.src = randomMovie.poster.replace(/\\/g, '/');
+                    bgBlurImg.style.opacity = '1';
+                }, 500);
+            }
+        }, 5000);
+    }
+
+    function stopBgCycle() {
+        clearInterval(bgCycleInterval);
+        bgCycleInterval = null;
+    }
+
+    window.addEventListener('mousemove', () => setActivity(true));
+    window.addEventListener('touchstart', () => setActivity(true));
+    window.addEventListener('scroll', () => {
+        hasInteracted = true;
+        setActivity(true);
+    });
+    
     function updateCartUI() {
         const cartCount = document.getElementById('cart-count');
         if (cartCount) {
@@ -162,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add wiggle hint if it's the first card and no interaction yet
         if (remaining.length === movies.length || (remaining.length === 10 && !sessionStorage.getItem('interacted'))) {
-            remaining[0].classList.add('hint-wiggle');
+            remaining[0].classList.add('animate-swipe');
         }
 
         // FADE OUT PRELOADER
@@ -178,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function hideTutorial() {
         const topCard = document.querySelector('.movie-card:not(.removed)');
-        if (topCard) topCard.classList.remove('hint-wiggle');
+        if (topCard) topCard.classList.remove('animate-swipe');
         
         document.getElementById('tutorial-left')?.style.setProperty('opacity', '0');
         document.getElementById('tutorial-right')?.style.setProperty('opacity', '0');
@@ -201,70 +256,83 @@ document.addEventListener('DOMContentLoaded', () => {
         const onTouchStart = (e) => {
             if(e.target.closest('button')) return;
             isDragging = true;
-            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-            startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            const touch = e.type.includes('mouse') ? e : e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            
+            card.classList.remove('animate-swipe', 'hint-wiggle');
             card.classList.add('moving');
-            sessionStorage.setItem('interacted', 'true');
-            hideTutorial(); // Remove hints as soon as user touches
+            
+            hasInteracted = true;
+            hideTutorial();
+            
+            // Modern event listener approach
+            if (e.type === 'mousedown') {
+                window.addEventListener('mousemove', onTouchMove, { passive: false });
+                window.addEventListener('mouseup', onTouchEnd);
+            } else {
+                window.addEventListener('touchmove', onTouchMove, { passive: false });
+                window.addEventListener('touchend', onTouchEnd);
+            }
         };
 
         const onTouchMove = (e) => {
             if (!isDragging) return;
             
-            const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-            const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            
-            currentX = x - startX;
-            currentY = y - startY;
+            const touch = e.type.includes('mouse') ? e : e.touches[0];
+            currentX = touch.clientX - startX;
+            currentY = touch.clientY - startY;
 
-            // Only prevent default if swiping horizontally
-            if (Math.abs(currentX) > Math.abs(currentY) || Math.abs(currentX) > 10) {
-                if (e.cancelable) e.preventDefault();
-            } else {
-                // If moving vertically, stop dragging to allow scroll
-                isDragging = false;
-                card.classList.remove('moving');
-                return;
-            }
+            // Prevent any scrolling while swiping
+            if (e.cancelable) e.preventDefault();
 
-            const rotate = 2 + (currentX * 0.05);
-            card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
+            const rotate = currentX * 0.05;
+            card.style.transform = `translate(${currentX}px, ${currentY * 0.2}px) rotate(${rotate}deg)`;
 
-            if (currentX > 0) {
-                badgeLike.style.opacity = Math.min(currentX / 100, 1);
+            if (currentX > 50) {
+                badgeLike.style.opacity = Math.min((currentX - 50) / 100, 1);
                 badgeNope.style.opacity = 0;
-            } else {
-                badgeNope.style.opacity = Math.min(Math.abs(currentX) / 100, 1);
+                card.classList.add('glow-like');
+                card.classList.remove('glow-nope');
+            } else if (currentX < -50) {
+                badgeNope.style.opacity = Math.min((Math.abs(currentX) - 50) / 100, 1);
                 badgeLike.style.opacity = 0;
+                card.classList.add('glow-nope');
+                card.classList.remove('glow-like');
+            } else {
+                badgeLike.style.opacity = 0;
+                badgeNope.style.opacity = 0;
+                card.classList.remove('glow-like', 'glow-nope');
             }
         };
 
-        const onTouchEnd = () => {
+        const onTouchEnd = (e) => {
             if(!isDragging) return;
             isDragging = false;
             card.classList.remove('moving');
 
-            const threshold = window.innerWidth / 4 > 100 ? window.innerWidth / 4 : 100;
+            window.removeEventListener('mousemove', onTouchMove);
+            window.removeEventListener('mouseup', onTouchEnd);
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('touchend', onTouchEnd);
 
+            const threshold = window.innerWidth / 3;
             if (currentX > threshold) {
                 swipe(card, 1);
             } else if (currentX < -threshold) {
                 swipe(card, -1);
             } else {
-                card.style.transform = 'translate(0px, 0px) scale(1) rotate(2deg)';
+                card.style.transform = 'translate(0px, 0px) scale(1)';
                 badgeLike.style.opacity = 0;
                 badgeNope.style.opacity = 0;
+                card.classList.remove('glow-like', 'glow-nope');
             }
             currentX = 0;
             currentY = 0;
         };
 
-        card.onmousedown = onTouchStart;
-        card.ontouchstart = onTouchStart;
-        window.onmousemove = onTouchMove;
-        window.ontouchmove = onTouchMove;
-        window.onmouseup = onTouchEnd;
-        window.ontouchend = onTouchEnd;
+        card.addEventListener('mousedown', onTouchStart);
+        card.addEventListener('touchstart', onTouchStart, { passive: false });
     }
 
     function swipe(card, dir) {

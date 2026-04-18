@@ -1,19 +1,35 @@
+require('dotenv').config();
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 
-// 1. Initialize Firebase Admin using Service Account from Environment
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+// 1. Initialize Firebase Admin
+let serviceAccount;
+try {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} catch (e) {
+    const fs = require('fs');
+    const path = require('path');
+    const localKeyPath = path.join(__dirname, '../noir-analytics-b7c31-firebase-adminsdk-fbsvc-d2f3a16abf.json');
+    if (fs.existsSync(localKeyPath)) {
+        serviceAccount = require(localKeyPath);
+    } else {
+        console.error('❌ Could not find Firebase Service Account Key.');
+        process.exit(1);
+    }
+}
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+}
 
 const db = admin.firestore();
 
 async function sendWeeklyReport() {
-    console.log('📊 Fetching data from Firestore...');
+    console.log('📊 Generating Comprehensive Weekly Report (Last 7 Days)...');
     
-    // Calculate last 7 days
+    // STRICT WEEKLY FILTER: Last 7 days only
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
@@ -26,17 +42,25 @@ async function sendWeeklyReport() {
         snapshot.forEach(doc => events.push(doc.data()));
 
         if (events.length === 0) {
-            console.log('⚠️ No events found for the last 7 days. Skipping report.');
+            console.log('⚠️ No activity found this week. Report skipped.');
             return;
         }
 
-        // --- Aggregation Logic ---
-        const uniqueSessions = new Set(events.map(e => e.session_id)).size;
-        const purchases = events.filter(e => e.event_type === 'purchase').length;
+        // --- ENHANCED ANALYTICS LOGIC ---
+        const sessions = new Set(events.map(e => e.session_id));
+        const totalVisitors = sessions.size;
+        
         const likes = events.filter(e => e.event_type === 'like').length;
         const nopes = events.filter(e => e.event_type === 'nope').length;
-        const conversionRate = uniqueSessions > 0 ? ((purchases / uniqueSessions) * 100).toFixed(2) : 0;
+        const totalSwipes = likes + nopes;
+        
+        const conversions = events.filter(e => e.event_type === 'purchase').length;
+        
+        // Conversions are actions like WhatsApp clicks
+        const interestRate = totalSwipes > 0 ? ((likes / totalSwipes) * 100).toFixed(1) : 0;
+        const conversionRate = totalVisitors > 0 ? ((conversions / totalVisitors) * 100).toFixed(1) : 0;
 
+        // Top 3 Movies
         const movieLikes = {};
         events.filter(e => e.event_type === 'like').forEach(e => {
             const title = e.metadata?.movie || 'Unknown';
@@ -44,9 +68,16 @@ async function sendWeeklyReport() {
         });
         const topMovies = Object.entries(movieLikes)
             .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
+            .slice(0, 3);
 
-        // --- Email Construction ---
+        const movieRows = topMovies.map(([title, count], idx) => `
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #222; color: #eee;">#${idx+1} ${title}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #222; text-align: right; color: #f2ca50; font-weight: bold;">${count} Likes</td>
+            </tr>
+        `).join('');
+
+        // --- EMAIL DESIGN ---
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
             port: 587,
@@ -57,51 +88,51 @@ async function sendWeeklyReport() {
             },
         });
 
-        const movieRows = topMovies.map(([title, count]) => `
-            <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #333;">${title}</td>
-                <td style="padding: 10px; border-bottom: 1px solid #333; text-align: right; color: #f2ca50;">${count} Likes</td>
-            </tr>
-        `).join('');
-
         const htmlContent = `
-            <div style="font-family: sans-serif; max-width: 600px; margin: auto; background: #000; color: #fff; padding: 30px; border-radius: 15px; border: 1px solid #f2ca50;">
-                <h1 style="color: #f2ca50; text-align: center; border-bottom: 1px solid #f2ca50; padding-bottom: 10px;">Noir Auteur Cloud Report</h1>
-                <p style="text-align: center; color: #888;">Weekly Analytics Summary (Auto-Generated)</p>
-                
-                <div style="display: flex; justify-content: space-around; margin: 20px 0;">
-                    <div style="text-align: center; background: #111; padding: 15px; border-radius: 10px; width: 45%;">
-                        <div style="font-size: 24px; color: #f2ca50; font-weight: bold;">${uniqueSessions}</div>
-                        <div style="font-size: 10px; text-transform: uppercase;">Unique Visitors</div>
+            <div style="background-color: #0c0c0c; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px 20px; max-width: 600px; margin: auto; border: 1px solid #1a1a1a; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #f2ca50; letter-spacing: 5px; margin: 0; font-size: 28px;">NOIR AUTEUR</h1>
+                    <p style="color: #666; font-size: 12px; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">Weekly Intelligence Briefing</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                    <div style="background: #151515; padding: 20px; border-radius: 6px; text-align: center; border: 1px solid #222;">
+                        <div style="font-size: 32px; color: #f2ca50; font-weight: bold;">${totalVisitors}</div>
+                        <div style="font-size: 10px; color: #888; text-transform: uppercase;">Unique Visitors</div>
                     </div>
-                    <div style="text-align: center; background: #111; padding: 15px; border-radius: 10px; width: 45%;">
-                        <div style="font-size: 24px; color: #10b981; font-weight: bold;">${conversionRate}%</div>
-                        <div style="font-size: 10px; text-transform: uppercase;">Conversion Rate</div>
+                    <div style="background: #151515; padding: 20px; border-radius: 6px; text-align: center; border: 1px solid #222;">
+                        <div style="font-size: 32px; color: #10b981; font-weight: bold;">${conversions}</div>
+                        <div style="font-size: 10px; color: #888; text-transform: uppercase;">Sales Inquiries</div>
                     </div>
                 </div>
 
-                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                    <tr style="background: #111; color: #f2ca50;">
-                        <th style="padding: 10px; text-align: left;">Top Movies</th>
-                        <th style="padding: 10px; text-align: right;">Count</th>
-                    </tr>
+                <div style="background: #111; padding: 20px; border-radius: 6px; margin-bottom: 30px; border-left: 4px solid #f2ca50;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase; color: #f2ca50;">Engagement Metrics</h3>
+                    <p style="margin: 5px 0; font-size: 14px;">Total Swipes: <span style="float: right; color: #f2ca50;">${totalSwipes}</span></p>
+                    <p style="margin: 5px 0; font-size: 14px;">Like Rate: <span style="float: right; color: #f2ca50;">${interestRate}%</span></p>
+                    <p style="margin: 5px 0; font-size: 14px;">Conversion Rate: <span style="float: right; color: #10b981;">${conversionRate}%</span></p>
+                </div>
+
+                <h3 style="margin: 10px 0; font-size: 14px; text-transform: uppercase; color: #888;">🔥 Trending This Week</h3>
+                <table style="width: 100%; border-collapse: collapse;">
                     ${movieRows}
                 </table>
 
-                <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #333; font-size: 12px; color: #555; text-align: center;">
-                    This report was generated by GitHub Actions. No server maintenance required.
+                <div style="text-align: center; margin-top: 40px; color: #444; font-size: 11px;">
+                    This report covers the last 7 days. Data remains secure in your Firebase cloud.<br>
+                    Generated automatically by Noir Analytics Engine.
                 </div>
             </div>
         `;
 
         await transporter.sendMail({
-            from: `"Noir Analytics Hub" <${process.env.SMTP_USER}>`,
+            from: `"Noir Intelligence" <${process.env.SMTP_USER}>`,
             to: process.env.REPORT_RECIPIENT_EMAIL,
-            subject: `📊 Noir Auteur: Weekly Insights (${new Date().toLocaleDateString()})`,
+            subject: `📊 Noir Auteur: Weekly Analytics [${new Date().toLocaleDateString()}]`,
             html: htmlContent,
         });
 
-        console.log('✅ Cloud Report sent successfully!');
+        console.log('✅ Detailed Weekly Report sent successfully!');
     } catch (error) {
         console.error('❌ Error generating report:', error);
         process.exit(1);
